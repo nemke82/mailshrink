@@ -13,7 +13,7 @@ import (
 
 // Build-time variables set via -ldflags.
 var (
-	Version   = "2025.08-dev"
+	Version   = "2026.08-dev"
 	BuildDate = "unknown"
 	GoVersion = "unknown"
 )
