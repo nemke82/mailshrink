@@ -15,7 +15,9 @@
 
 ## Demo
 
-![MailShrink Demo](docs/demo.gif)
+<p align="center">
+  <img src="docs/demo.gif" alt="MailShrink Demo" width="100%">
+</p>
 
 
 ## Install
