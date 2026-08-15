@@ -15,7 +15,7 @@
 
 ## Demo
 
-[![asciicast](https://asciinema.org/a/1Gm7cHYh8FfGNXTA.svg)](https://asciinema.org/a/1Gm7cHYh8FfGNXTA)
+![MailShrink Demo](docs/demo.gif)
 
 
 ## Install
