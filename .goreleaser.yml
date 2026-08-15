@@ -39,6 +39,8 @@ release:
     name: mailshrink
   draft: false
   prerelease: auto
+  mode: replace
+  replace_existing_artifacts: true
   name_template: "MailShrink {{ .Tag }}"
   header: |
     ## MailShrink {{ .Tag }}
