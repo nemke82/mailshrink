@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./... -race -count=1
+
+builds:
+  - id: mailshrink
+    main: .
+    binary: mailshrink
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X 'github.com/nemke82/mailshrink/cmd.Version={{ .Tag }}'
+      - -X 'github.com/nemke82/mailshrink/cmd.BuildDate={{ .Date }}'
+      - -X 'github.com/nemke82/mailshrink/cmd.GoVersion={{ .Env.GOVERSION }}'
+
+archives:
+  - id: binary
+    format: binary
+    name_template: "{{ .Binary }}-{{ .Os }}-{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+release:
+  github:
+    owner: nemke82
+    name: mailshrink
+  draft: false
+  prerelease: auto
+  name_template: "MailShrink {{ .Tag }}"
+  header: |
+    ## MailShrink {{ .Tag }}
+
+    Safely reclaim disk space on Dovecot Maildir servers by analyzing and
+    transparently compressing old email.
+
+  footer: |
+    ### Quick Install
+
+    ```bash
+    curl -sL https://github.com/nemke82/mailshrink/releases/download/{{ .Tag }}/mailshrink-linux-amd64 \
+      -o /usr/local/bin/mailshrink && chmod +x /usr/local/bin/mailshrink
+    ```
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+  groups:
+    - title: Features
+      regexp: '^feat'
+    - title: Bug Fixes
+      regexp: '^fix'
+    - title: Others
+      order: 999
