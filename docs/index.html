@@ -246,15 +246,119 @@
       text-decoration: underline;
     }
 
+    /* ── Navigation ──────────────────────── */
+    .navbar {
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--accent);
+    }
+
+    /* ── Guide Banner Card ──────────────── */
+    .guide-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .guide-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .guide-card p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .guide-btn {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .guide-btn:hover {
+      opacity: 0.9;
+    }
+
     /* ── Responsive ────────────────────── */
     @media (max-width: 600px) {
       .hero h1 { font-size: 2rem; }
       .hero p { font-size: 1rem; }
       .features { grid-template-columns: 1fr; }
+      .guide-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <span>⚡</span> MailShrink
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="guide.html">Documentation</a></li>
+        <li><a href="https://github.com/nemke82/mailshrink" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/nemke82/mailshrink/releases" target="_blank" rel="noopener">Releases</a></li>
+      </ul>
+    </div>
+  </nav>
   <div class="container">
 
     <!-- Hero -->
@@ -348,9 +452,20 @@
       </div>
     </section>
 
+    <!-- Production Guide Banner -->
+    <div class="guide-card">
+      <div>
+        <h3>📖 Production & Bulk Automation Guide</h3>
+        <p>Learn how to deploy MailShrink with Ansible, automate background cronjobs with ionice/nice, perform mass scanning, and optimize storage before migrations.</p>
+      </div>
+      <a href="guide.html" class="guide-btn">Read the Guide →</a>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
       <p>
+        <a href="index.html">Home</a> · 
+        <a href="guide.html">Documentation</a> · 
         <a href="https://github.com/nemke82/mailshrink">GitHub</a> · 
         <a href="https://github.com/nemke82/mailshrink/releases">Releases</a> · 
         MIT License

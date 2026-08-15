@@ -6,6 +6,7 @@
 <p align="center">
   <a href="https://github.com/nemke82/mailshrink/releases">Releases</a> •
   <a href="https://nemke82.github.io/mailshrink/">Website</a> •
+  <a href="https://nemke82.github.io/mailshrink/guide.html">Documentation</a> •
   <a href="SECURITY.md">Security</a>
 </p>
 
@@ -125,6 +126,16 @@ MailShrink auto-detects your server layout:
 | **DirectAdmin** | `/home/user/imap/domain/account/Maildir/` | ✅ |
 | **Custom Dovecot** | Any Maildir with `cur/new/tmp` | ✅ |
 | **Plesk** | `/var/qmail/mailnames/domain/account/Maildir/` | 🔜 |
+
+## Production & Bulk Automation
+
+For multi-server hosting environments, fleet automation, and scheduled maintenance, see the **[Production & Bulk Automation Guide](https://nemke82.github.io/mailshrink/guide.html)**:
+
+- 📦 **[Ansible Deployment](https://nemke82.github.io/mailshrink/guide.html#ansible)** — Playbook to deploy and verify MailShrink across your fleet
+- 📊 **[Mass Scanning & JQ](https://nemke82.github.io/mailshrink/guide.html#mass-scan)** — Auditing hundreds of accounts with high concurrency and JSON export
+- ⏰ **[Automated Maintenance Cronjobs](https://nemke82.github.io/mailshrink/guide.html#cronjobs)** — Safe recurring background compression with `ionice` & `nice`
+- 🚀 **[Pre-Migration Optimization](https://nemke82.github.io/mailshrink/guide.html#pre-migration)** — Shrink mail storage before server transfers
+- 🛡️ **[Disk Monitoring & Emergency Hooks](https://nemke82.github.io/mailshrink/guide.html#monitoring)** — Automated reclamation script when disk reaches 90%+
 
 ## Origin
 

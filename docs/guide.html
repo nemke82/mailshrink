@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailShrink — Production & Bulk Automation Guide</title>
+  <meta name="description" content="Production deployment and bulk automation guide for MailShrink. Ansible playbooks, fleet scanning, automated cronjobs, and pre-migration compression recipes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e17;
+      --bg-card: #111827;
+      --bg-code: #0d1117;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --purple: #c084fc;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navigation ──────────────────────── */
+    .navbar {
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--accent);
+    }
+
+    /* ── Layout ─────────────────────────── */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .header-section {
+      margin-bottom: 40px;
+    }
+
+    .header-section h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-section p {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Quick Nav TOC ──────────────────── */
+    .toc-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 48px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .toc-btn {
+      color: var(--text-dim);
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .toc-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    /* ── Doc Sections ───────────────────── */
+    .doc-section {
+      margin-bottom: 56px;
+      scroll-margin-top: 80px;
+    }
+
+    .doc-section h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+    }
+
+    .doc-section h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 28px 0 12px;
+      color: var(--accent);
+    }
+
+    .doc-section p {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    .doc-section ul {
+      margin: 0 0 20px 24px;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    .doc-section li {
+      margin-bottom: 8px;
+    }
+
+    /* ── Callout Box ────────────────────── */
+    .callout {
+      background: rgba(56, 189, 248, 0.05);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+
+    .callout.tip {
+      background: rgba(74, 222, 128, 0.05);
+      border-color: var(--green);
+    }
+
+    .callout.tip .callout-title {
+      color: var(--green);
+    }
+
+    /* ── Code Blocks ────────────────────── */
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .code-header {
+      background: rgba(30, 41, 59, 0.5);
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .code-block pre {
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .code-block code {
+      font-family: var(--mono);
+    }
+
+    .keyword { color: #f472b6; }
+    .string { color: var(--green); }
+    .comment { color: #64748b; font-style: italic; }
+    .command { color: var(--accent); }
+    .flag { color: var(--yellow); }
+
+    /* ── Footer ─────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .header-section h1 { font-size: 1.8rem; }
+      .toc-bar { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <span>⚡</span> MailShrink
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="guide.html" class="active">Documentation</a></li>
+        <li><a href="https://github.com/nemke82/mailshrink" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/nemke82/mailshrink/releases" target="_blank" rel="noopener">Releases</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header-section">
+      <h1>Production & Bulk Automation Guide</h1>
+      <p>Best practices for managing MailShrink across multi-server hosting environments, automated maintenance cronjobs, and fleet-wide storage optimization.</p>
+    </header>
+
+    <!-- Table of Contents -->
+    <div class="toc-bar">
+      <a href="#ansible" class="toc-btn">1. Ansible Deployment</a>
+      <a href="#mass-scan" class="toc-btn">2. Mass Scanning & Analytics</a>
+      <a href="#cronjobs" class="toc-btn">3. Automated Cronjobs</a>
+      <a href="#pre-migration" class="toc-btn">4. Pre-Migration Optimization</a>
+      <a href="#monitoring" class="toc-btn">5. Disk Monitoring & Alert Hooks</a>
+    </div>
+
+    <!-- ── 1. Ansible Deployment ────────────────── -->
+    <section id="ansible" class="doc-section">
+      <h2><span>📦</span> 1. Deploying MailShrink with Ansible</h2>
+      <p>MailShrink compiles to a single self-contained static binary with zero runtime dependencies. You can distribute and update it across thousands of cPanel, DirectAdmin, or custom Linux mail servers using a lightweight Ansible task.</p>
+
+      <h3>Production Playbook (`deploy-mailshrink.yml`)</h3>
+      <p>This playbook downloads the latest binary directly from GitHub Releases, installs it to <code>/usr/local/bin</code>, verifies execution, and runs the built-in Dovecot zlib pre-flight check:</p>
+
+      <div class="code-block">
+        <div class="code-header">deploy-mailshrink.yml</div>
+        <pre><code><span class="comment">---</span>
+- <span class="keyword">name</span>: Deploy MailShrink to Mail Servers
+  <span class="keyword">hosts</span>: mail_servers
+  <span class="keyword">become</span>: yes
+  <span class="keyword">vars</span>:
+    <span class="keyword">mailshrink_version</span>: <span class="string">"v2026.08.15"</span>
+    <span class="keyword">mailshrink_arch</span>: <span class="string">"{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"</span>
+
+  <span class="keyword">tasks</span>:
+    - <span class="keyword">name</span>: Download MailShrink binary
+      <span class="keyword">ansible.builtin.get_url</span>:
+        <span class="keyword">url</span>: <span class="string">"https://github.com/nemke82/mailshrink/releases/download/{{ mailshrink_version }}/mailshrink-linux-{{ mailshrink_arch }}"</span>
+        <span class="keyword">dest</span>: <span class="string">"/usr/local/bin/mailshrink"</span>
+        <span class="keyword">mode</span>: <span class="string">'0755'</span>
+        <span class="keyword">owner</span>: <span class="string">root</span>
+        <span class="keyword">group</span>: <span class="string">root</span>
+
+    - <span class="keyword">name</span>: Verify MailShrink version
+      <span class="keyword">ansible.builtin.command</span>: <span class="string">/usr/local/bin/mailshrink version</span>
+      <span class="keyword">register</span>: mailshrink_ver
+      <span class="keyword">changed_when</span>: false
+
+    - <span class="keyword">name</span>: Run Dovecot readiness pre-flight check
+      <span class="keyword">ansible.builtin.command</span>: <span class="string">/usr/local/bin/mailshrink check</span>
+      <span class="keyword">register</span>: dovecot_check
+      <span class="keyword">changed_when</span>: false
+      <span class="keyword">failed_when</span>: false
+
+    - <span class="keyword">name</span>: Print Dovecot readiness status
+      <span class="keyword">ansible.builtin.debug</span>:
+        <span class="keyword">msg</span>: <span class="string">"{{ dovecot_check.stdout }}"</span></code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">Zero Package Manager Overhead</div>
+        <p>Because MailShrink is compiled with <code>CGO_ENABLED=0</code>, it works seamlessly on AlmaLinux 8/9, Rocky Linux, CentOS, Ubuntu 20.04/22.04/24.04, and Debian without installing Go, Python modules, or pip packages.</p>
+      </div>
+    </section>
+
+    <!-- ── 2. Mass Scanning & Analytics ────────── -->
+    <section id="mass-scan" class="doc-section">
+      <h2><span>📊</span> 2. Mass Scanning & Fleet Analytics</h2>
+      <p>When managing servers with hundreds of accounts and hundreds of gigabytes of Maildir storage, MailShrink provides multi-threaded scanning and structured JSON output for scriptable storage auditing.</p>
+
+      <h3>Scan Server with High Concurrency</h3>
+      <p>By default, MailShrink uses 4 parallel workers. On servers with NVMe or high-speed disk arrays, you can scale concurrency up to speed up discovery:</p>
+
+      <div class="code-block">
+        <div class="code-header">Terminal</div>
+        <pre><code><span class="comment"># Scan all mailboxes under /home with 16 parallel threads</span>
+<span class="command">mailshrink</span> analyze <span class="flag">--path</span> /home <span class="flag">-j</span> 16
+
+<span class="comment"># Scan only emails older than 2 years</span>
+<span class="command">mailshrink</span> analyze <span class="flag">--older-than</span> 2y</code></pre>
+      </div>
+
+      <h3>Extracting Top Reclaimable Domains with `jq`</h3>
+      <p>Using the <code>--json</code> flag, you can pipe MailShrink results into <code>jq</code> or reporting pipelines:</p>
+
+      <div class="code-block">
+        <div class="code-header">Bash / JQ Pipeline</div>
+        <pre><code><span class="comment"># Find the top 5 domains by reclaimable disk space</span>
+<span class="command">mailshrink</span> analyze <span class="flag">--json</span> | jq <span class="string">'.estimates | to_entries | sort_by(-.value.EstimatedSavings) | .[0:5][] | {domain: .key, savings_mb: (.value.EstimatedSavings / 1048576 | round)}'</span></code></pre>
+      </div>
+
+      <h3>Exporting a Detailed Per-Account Plan to CSV</h3>
+      <p>Generate a spreadsheet report of compressible mailboxes for customer billing or quota reviews:</p>
+
+      <div class="code-block">
+        <div class="code-header">Bash Export</div>
+        <pre><code><span class="comment"># Generate CSV from plan output</span>
+echo <span class="string">"Account,Folder,Period,Size_Bytes,Est_Savings_Bytes"</span> > /var/log/mailshrink_report.csv
+<span class="command">mailshrink</span> plan <span class="flag">--json</span> | jq -r <span class="string">'.[] | "\(.account),\(.folder),\(.period),\(.size),\(.estimate.EstimatedSavings // 0)"'</span> >> /var/log/mailshrink_report.csv</code></pre>
+      </div>
+    </section>
+
+    <!-- ── 3. Automated Cronjobs ────────────────── -->
+    <section id="cronjobs" class="doc-section">
+      <h2><span>⏰</span> 3. Automated Maintenance Cronjobs</h2>
+      <p>Compressing old emails should be a hands-off, recurring maintenance task. MailShrink's atomic design, advisory locking, and mtime preservation ensure it can run safely in the background on live production servers.</p>
+
+      <h3>Low-Priority Background Execution (`nice` & `ionice`)</h3>
+      <p>To guarantee that compression never causes I/O spikes or slows down active IMAP/SMTP deliveries, always run cronjobs with <code>nice -n 19</code> (lowest CPU priority) and <code>ionice -c 3</code> (idle disk I/O class):</p>
+
+      <div class="code-block">
+        <div class="code-header">/etc/cron.d/mailshrink</div>
+        <pre><code><span class="comment"># /etc/cron.d/mailshrink - Weekly automated Dovecot Maildir compression
+# Runs every Sunday at 02:30 AM</span>
+<span class="keyword">30 2 * * 0 root</span> /usr/bin/ionice -c 3 /usr/bin/nice -n 19 /usr/local/bin/mailshrink compress \
+  --path /home \
+  --older-than 1y \
+  --apply \
+  >> /var/log/mailshrink.log 2>&1</code></pre>
+      </div>
+
+      <h3>Tiered Compression Strategies</h3>
+      <p>Different folders accumulate data at different rates. Here are proven production recipes:</p>
+
+      <ul>
+        <li><strong>Sent Folders (Highest Gain):</strong> Sent emails are rarely modified and often contain large uncompressed attachments. Compress Sent messages older than 6 months:
+          <div class="code-block" style="margin-top: 8px;">
+            <div class="code-header">Weekly Sent Compression</div>
+            <pre><code><span class="command">mailshrink</span> compress <span class="flag">--folder</span> Sent <span class="flag">--older-than</span> 6m <span class="flag">--apply</span></code></pre>
+          </div>
+        </li>
+        <li><strong>Archive / INBOX Folders:</strong> For general folders, compress messages older than 2 years:
+          <div class="code-block" style="margin-top: 8px;">
+            <div class="code-header">Monthly Archive Compression</div>
+            <pre><code><span class="command">mailshrink</span> compress <span class="flag">--older-than</span> 2y <span class="flag">--apply</span></code></pre>
+          </div>
+        </li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">Built-in Idempotency</div>
+        <p>MailShrink inspects the magic bytes of every email before compressing. If a file is already gzip-compressed, MailShrink skips it instantly (0 ms). Running a weekly cronjob is ultra-fast because it only touches newly aged emails.</p>
+      </div>
+    </section>
+
+    <!-- ── 4. Pre-Migration Optimization ───────── -->
+    <section id="pre-migration" class="doc-section">
+      <h2><span>🚀</span> 4. Pre-Migration Optimization</h2>
+      <p>Transferring massive Maildirs across servers (e.g., during cPanel-to-cPanel transfers, DirectAdmin migrations, or rsync syncs) is often bottlenecked by millions of small files and heavy disk usage.</p>
+
+      <h3>The 3-Step Migration Workflow:</h3>
+      <ol style="margin-left: 24px; color: var(--text-dim); margin-bottom: 20px;">
+        <li style="margin-bottom: 10px;"><strong>Verify Target Server:</strong> Run <code>mailshrink check</code> on both source and target servers to ensure Dovecot's zlib plugin is enabled on both sides.</li>
+        <li style="margin-bottom: 10px;"><strong>Compress Source Mailboxes First:</strong> Run MailShrink on the source server before starting your transfer:
+          <div class="code-block" style="margin-top: 8px;">
+            <div class="code-header">Source Server</div>
+            <pre><code><span class="command">mailshrink</span> compress <span class="flag">--path</span> /home <span class="flag">--older-than</span> 6m <span class="flag">--apply</span></code></pre>
+          </div>
+        </li>
+        <li><strong>Transfer Compressed Maildir:</strong> Run your standard cPanel Transfer Tool or <code>rsync -aHAX</code>. The transfer completes <strong>25% to 40% faster</strong>, saving gigabytes of network bandwidth and disk on the destination.</li>
+      </ol>
+    </section>
+
+    <!-- ── 5. Disk Monitoring & Alert Hooks ────── -->
+    <section id="monitoring" class="doc-section">
+      <h2><span>🛡️</span> 5. Disk Monitoring & Emergency Reclamation</h2>
+      <p>If your monitoring system (e.g., Zabbix, Prometheus, Datadog, or Munin) detects that a mail partition has crossed 90% utilization, you can trigger MailShrink automatically to reclaim critical disk space before service degradation occurs.</p>
+
+      <h3>Emergency Reclamation Script (`mailshrink-emergency.sh`)</h3>
+      <div class="code-block">
+        <div class="code-header">/usr/local/sbin/mailshrink-emergency.sh</div>
+        <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="comment"># Emergency disk space reclamation for Dovecot Maildir</span>
+set -euo pipefail
+
+DISK_USAGE=$(df -h /home | awk 'NR==2 {print $5}' | tr -d '%')
+THRESHOLD=90
+
+if [ "$DISK_USAGE" -ge "$THRESHOLD" ]; then
+    logger -t mailshrink "Disk usage on /home is ${DISK_USAGE}%. Triggering emergency MailShrink compression..."
+    
+    <span class="comment"># Compress Sent items older than 90 days</span>
+    /usr/local/bin/mailshrink compress --path /home --folder Sent --older-than 90d --apply
+    
+    <span class="comment"># Compress any mail older than 1 year</span>
+    /usr/local/bin/mailshrink compress --path /home --older-than 1y --apply
+    
+    NEW_USAGE=$(df -h /home | awk 'NR==2 {print $5}' | tr -d '%')
+    logger -t mailshrink "Emergency compression completed. New disk usage: ${NEW_USAGE}%."
+fi</code></pre>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>
+        <a href="index.html">Home</a> · 
+        <a href="https://github.com/nemke82/mailshrink">GitHub Repository</a> · 
+        <a href="https://github.com/nemke82/mailshrink/releases">Releases</a> · 
+        MIT License
+      </p>
+    </footer>
+
+  </div>
+
+</body>
+</html>
