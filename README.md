@@ -5,7 +5,6 @@
 
 <p align="center">
   <a href="https://github.com/nemke82/mailshrink/releases">Releases</a> •
-  <a href="https://nemke82.github.io/mailshrink">Website</a> •
   <a href="SECURITY.md">Security</a>
 </p>
 
@@ -122,9 +121,7 @@ MailShrink auto-detects your server layout:
 
 ## Origin
 
-> I wrote shell scripts to reclaim disk space from a production cPanel server.
-> After recovering several GB without deleting a single customer email,
-> I turned the process into MailShrink.
+Based on the article [How I Saved Gigabytes of Disk Space by Compressing Old Dovecot Maildir Emails on cPanel](https://nemanja.io/how-i-saved-gigabytes-of-disk-space-by-compressing-old-dovecot-maildir-emails-on-cpanel/), which helped reclaim free disk space on production servers. MailShrink turns that manual process into a safe, automated tool.
 
 ## License
 
