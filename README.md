@@ -5,6 +5,7 @@
 
 <p align="center">
   <a href="https://github.com/nemke82/mailshrink/releases">Releases</a> •
+  <a href="https://nemke82.github.io/mailshrink/">Website</a> •
   <a href="SECURITY.md">Security</a>
 </p>
 
