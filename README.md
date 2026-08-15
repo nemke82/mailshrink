@@ -13,6 +13,10 @@
 
 > MailShrink does not simply run `gzip` over your Maildir. It understands Dovecot Maildir metadata, preserves `INTERNALDATE`, validates `S=` metadata, uses mailbox locking, detects existing compression, performs atomic replacement, and verifies messages before removing the uncompressed copy.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/1Gm7cHYh8FfGNXTA.svg)](https://asciinema.org/a/1Gm7cHYh8FfGNXTA)
+
 
 ## Install
 
